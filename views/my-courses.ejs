@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Courses - MAGIC OF ARYA</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <h1>MAGIC OF ARYA</h1>
+                    <p class="tagline">The Sorcerer</p>
+                </div>
+                <nav class="nav">
+                    <a href="/">Home</a>
+                    <a href="/store">Courses</a>
+                    <a href="/my-courses" class="active">My Courses</a>
+                    <span class="user-name">Welcome, <%= user.name %>!</span>
+                    <button class="btn-logout" onclick="logout()">Logout</button>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- My Courses Section -->
+    <section class="my-courses-section">
+        <div class="container">
+            <div class="my-courses-header">
+                <h1>My Courses</h1>
+                <p>Access all your purchased courses</p>
+            </div>
+
+            <% if (courses.length===0) { %>
+                <div class="empty-state">
+                    <div class="empty-icon">📚</div>
+                    <h2>No Courses Yet</h2>
+                    <p>You haven't purchased any courses yet. Explore our course catalog to get started!</p>
+                    <a href="/store" class="btn-primary">Browse Courses</a>
+                </div>
+                <% } else { %>
+                    <div class="courses-grid">
+                        <% courses.forEach(course=> { %>
+                            <div class="course-card purchased">
+                                <div class="course-image">
+                                    <img src="<%= course.image %>" alt="<%= course.title %>">
+                                    <div class="course-badge purchased-badge">Purchased</div>
+                                </div>
+                                <div class="course-content">
+                                    <div class="course-category">
+                                        <%= course.category %>
+                                    </div>
+                                    <h3>
+                                        <%= course.title %>
+                                    </h3>
+                                    <p>
+                                        <%= course.description %>
+                                    </p>
+                                    <ul class="course-features">
+                                        <% course.features.forEach(feature=> { %>
+                                            <li>✓ <%= feature %>
+                                            </li>
+                                            <% }); %>
+                                    </ul>
+                                    <button class="btn-primary btn-watch">
+                                        ▶ Watch Now
+                                    </button>
+                                </div>
+                            </div>
+                            <% }); %>
+                    </div>
+                    <% } %>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>MAGIC OF ARYA</h3>
+                    <p>The Sorcerer</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <a href="/">Home</a>
+                    <a href="/store">Courses</a>
+                    <a href="/my-courses">My Courses</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2025 Arya Chandel - The Mentalist. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="/js/main.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,84 @@
+<!-- Footer -->
+<footer class="footer">
+    <div class="container">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>MAGIC OF ARYA</h3>
+                <p>The Sorcerer</p>
+            </div>
+            <div class="footer-section">
+                <h4>Quick Links</h4>
+                <a href="/">Home</a>
+                <a href="/store">Courses</a>
+                <a href="/admin">Admin</a>
+            </div>
+            <div class="footer-section">
+                <h4>Legal</h4>
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Service</a>
+                <a href="#">Refund Policy</a>
+            </div>
+            <div class="footer-section">
+                <h4>Contact</h4>
+                <p>Call: +91 8830258349</p>
+                <p>Email: contact@magicofarya.com</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>© 2025 Arya Chandel - The Mentalist. All rights reserved.</p>
+        </div>
+    </div>
+</footer>
+
+<!-- Floating Support Button -->
+<% if (typeof settings !=='undefined' && settings && settings.supportTelegramId) { %>
+    <a href="https://t.me/<%= settings.supportTelegramId %>" target="_blank" class="floating-support-btn"
+        title="Chat with Support">
+        <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+            <path
+                d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z" />
+        </svg>
+    </a>
+    <% } %>
+
+        <!-- Login Modal -->
+        <div id="loginModal" class="modal">
+            <div class="modal-content">
+                <button class="modal-close" onclick="closeLoginModal()">×</button>
+                <h2 id="modalTitle">Welcome Back</h2>
+                <form id="loginForm" onsubmit="handleLogin(event)">
+                    <div class="form-group" id="nameField" style="display: none;">
+                        <input type="text" name="name" placeholder="Name">
+                    </div>
+                    <div class="form-group">
+                        <input type="email" name="email" placeholder="Email address" required>
+                    </div>
+                    <div class="form-group password-group">
+                        <input type="password" name="password" id="password" placeholder="Password" required>
+                        <button type="button" class="toggle-password" onclick="togglePassword()">👁</button>
+                    </div>
+                    <button type="submit" class="btn-submit" id="submitAuthBtn">Login</button>
+                    <div class="divider">
+                        <span>Or</span>
+                    </div>
+                    <button type="button" class="btn-google">
+                        <span class="google-icon">G</span>
+                        Continue with Google
+                    </button>
+                    <p class="login-footer" id="toggleText">
+                        Don't have an account? <a href="#" onclick="toggleAuthMode(); event.preventDefault()">Sign
+                            Up</a>
+                    </p>
+                    <p class="terms">
+                        By continuing, you agree to our <a href="#">Terms of Service</a> and <a href="#">Privacy
+                            Policy</a>
+                    </p>
+                </form>
+                <div id="loginMessage" class="login-message"></div>
+            </div>
+        </div>
+
+        <script src="/js/main.js"></script>
+        </body>
+
+        </html>

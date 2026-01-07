@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout - <%= course.title %>
+    </title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+</head>
+
+<%- include('partials/header') %>
+
+    <!-- Checkout Section -->
+    <section class="checkout-section">
+        <div class="container">
+            <div class="checkout-container">
+                <div class="checkout-card">
+                    <h1>Complete Your Purchase</h1>
+
+                    <!-- Course Details -->
+                    <div class="course-summary">
+                        <img src="<%= course.image %>" alt="<%= course.title %>">
+                        <div class="course-info">
+                            <h2>
+                                <%= course.title %>
+                            </h2>
+                            <p>
+                                <%= course.description %>
+                            </p>
+                            <div class="price-display">
+                                ₹<%= (course.price || 0).toLocaleString() %>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Payment Method Selection -->
+                    <div class="payment-methods">
+                        <h3>Select Payment Method</h3>
+
+                        <div class="payment-option" onclick="selectPayment('upi')">
+                            <div class="payment-option-header">
+                                <div class="payment-icon">📱</div>
+                                <div class="payment-details">
+                                    <h4>UPI Payment</h4>
+                                    <p>Pay using any UPI app (GPay, PhonePe, Paytm, etc.)</p>
+                                </div>
+                                <div class="payment-arrow">→</div>
+                            </div>
+                        </div>
+
+                        <div class="payment-option" onclick="selectPayment('binance')">
+                            <div class="payment-option-header">
+                                <div class="payment-icon">🪙</div>
+                                <div class="payment-details">
+                                    <h4>Binance Pay / Crypto</h4>
+                                    <p>Pay using USDT/Crypto QR Code</p>
+                                </div>
+                                <div class="payment-arrow">→</div>
+                            </div>
+                        </div>
+
+                        <div class="payment-option" onclick="selectPayment('card')">
+                            <div class="payment-option-header">
+                                <div class="payment-icon">💳</div>
+                                <div class="payment-details">
+                                    <h4>Credit/Debit Card</h4>
+                                    <p>Pay securely with your card</p>
+                                </div>
+                                <div class="payment-arrow">→</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="checkout-footer">
+                        <a href="/store" class="btn-secondary">Cancel</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <%- include('partials/footer') %>
+
+        <script>
+            const courseId = '<%= course._id %>';
+
+            async function selectPayment(method) {
+                try {
+                    const response = await fetch('/api/orders/create', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            courseId: courseId,
+                            paymentMethod: method
+                        })
+                    });
+
+                    const result = await response.json();
+
+                    if (result.success) {
+                        if (method === 'upi') {
+                            window.location.href = `/payment/upi/${result.orderId}`;
+                        } else if (method === 'binance') {
+                            window.location.href = `/payment/binance/${result.orderId}`;
+                        } else if (method === 'card') {
+                            window.location.href = `/payment/card/${result.orderId}`;
+                        }
+                    } else {
+                        alert(result.message || 'Error creating order');
+                    }
+                } catch (error) {
+                    console.error('Payment selection error:', error);
+                    alert('An error occurred. Please try again.');
+                }
+            }
+        </script>
+        </body>
+
+</html>

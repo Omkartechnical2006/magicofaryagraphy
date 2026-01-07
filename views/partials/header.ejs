@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MAGIC OF ARYA - The Sorcerer</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <h1>MAGIC OF ARYA</h1>
+                    <p class="tagline">The Sorcerer</p>
+                </div>
+                <nav class="nav">
+                    <a href="/">Home</a>
+                    <a href="/store">Courses</a>
+                    <a href="/contact">Contact</a>
+                    <a href="tel:+918830258349">Call Now</a>
+                    <% if (typeof user !=='undefined' && user) { %>
+                        <a href="/my-courses">My Courses</a>
+                        <span class="user-name">Welcome, <%= user.name %>!</span>
+                        <button class="btn-logout" onclick="logout()">Logout</button>
+                        <% } else { %>
+                            <button class="btn-login" onclick="openLoginModal()">Login</button>
+                            <% } %>
+                </nav>
+                <button class="mobile-menu-btn">☰</button>
+            </div>
+        </div>
+    </header>

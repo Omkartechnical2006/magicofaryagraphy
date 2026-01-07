@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Binance Payment</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <h1>MAGIC OF ARYA</h1>
+                    <p class="tagline">The Sorcerer</p>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Payment Section -->
+    <section class="payment-section">
+        <div class="container">
+            <div class="payment-container">
+                <div class="payment-card">
+                    <!-- Timer -->
+                    <div class="payment-timer" id="timerBox">
+                        <div class="timer-icon">⏰</div>
+                        <div class="timer-content">
+                            <p>Complete payment within</p>
+                            <div id="timer" class="timer-display">10:00</div>
+                        </div>
+                    </div>
+
+                    <!-- Course Info -->
+                    <div class="payment-course-info" id="courseInfo">
+                        <h2>
+                            <%= order.course.title %>
+                        </h2>
+                        <div class="payment-amount">₹<%= order.amount.toLocaleString() %>
+                        </div>
+                        <p style="text-align: center; color: #a0a0c0; font-size: 0.9rem;">(Check Binance for approx USDT
+                            equivalent)</p>
+                    </div>
+
+                    <!-- Binance Instructions -->
+                    <div class="upi-instructions" id="instructions">
+                        <h3>Pay via Binance / Crypto</h3>
+                        <div class="upi-steps">
+                            <div class="upi-step">
+                                <span class="step-number">1</span>
+                                <p>Scan QR code or copy Wallet Address</p>
+                            </div>
+                            <div class="upi-step">
+                                <span class="step-number">2</span>
+                                <p>Send the equivalent amount</p>
+                            </div>
+                            <div class="upi-step">
+                                <span class="step-number">3</span>
+                                <p>Submit Transaction Hash below</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Details -->
+                    <div class="upi-details" id="details">
+                        <div style="text-align: center; margin-bottom: 1.5rem;">
+                            <!-- QR Code Placeholder -->
+                            <img src="<%= settings.binanceQrUrl %>" alt="Binance QR"
+                                style="max-width: 200px; border-radius: 12px; border: 1px solid #333;">
+                        </div>
+
+                        <div class="upi-id-display">
+                            <span class="label">Wallet:</span>
+                            <span class="value" style="font-size: 0.8rem; word-break: break-all;">
+                                <%= settings.binanceWallet || 'No wallet configured' %>
+                            </span>
+                            <button onclick="copyWallet()" class="btn-copy">Copy</button>
+                        </div>
+                    </div>
+
+                    <!-- Transaction ID Form -->
+                    <div class="transaction-form" id="transactionForm">
+                        <h4>Payment Completed?</h4>
+                        <p>Enter your Transaction Hash / ID:</p>
+                        <form onsubmit="verifyPayment(event)">
+                            <input type="text" id="transactionId" placeholder="Enter Transaction Hash" required>
+                            <button type="submit" class="btn-primary">Verify Payment</button>
+                        </form>
+                    </div>
+
+                    <!-- Failure Message (Hidden by default) -->
+                    <div id="failureMessage" class="card-error-message" style="display: none;">
+                        <div class="error-icon">⚠️</div>
+                        <h3>Payment Failed or Timed Out</h3>
+                        <p>We couldn't verify your payment. If you have already paid, please contact our support team
+                            immediately.</p>
+                        <div class="telegram-contact">
+                            <p><strong>Need Help?</strong></p>
+                            <p>Please contact our support team on Telegram:</p>
+                            <a href="https://t.me/<%= settings.supportTelegramId %>" target="_blank"
+                                class="telegram-link">
+                                <span class="telegram-icon">📱</span>
+                                @<%= settings.supportTelegramId %>
+                            </a>
+                        </div>
+                        <button onclick="window.location.href='/store'" class="btn-secondary">
+                            Return to Store
+                        </button>
+                    </div>
+
+                    <div id="statusMessage" class="status-message"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        const orderId = '<%= order._id %>';
+        const expiresAt = new Date('<%= order.expiresAt %>');
+        let timerInterval;
+
+        // Start timer
+        function startTimer() {
+            timerInterval = setInterval(() => {
+                const now = new Date();
+                const remaining = expiresAt - now;
+
+                if (remaining <= 0) {
+                    showFailure();
+                    return;
+                }
+
+                const minutes = Math.floor(remaining / 60000);
+                const seconds = Math.floor((remaining % 60000) / 1000);
+                document.getElementById('timer').textContent =
+                    `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+
+                if (remaining < 120000) {
+                    document.getElementById('timer').style.color = '#f59e0b';
+                }
+            }, 1000);
+        }
+
+        function showFailure() {
+            clearInterval(timerInterval);
+            document.getElementById('timerBox').style.display = 'none';
+            document.getElementById('courseInfo').style.display = 'none';
+            document.getElementById('instructions').style.display = 'none';
+            document.getElementById('details').style.display = 'none';
+            document.getElementById('transactionForm').style.display = 'none';
+
+            document.getElementById('failureMessage').style.display = 'block';
+        }
+
+        function copyWallet() {
+            navigator.clipboard.writeText('<%= settings.binanceWallet %>');
+            alert('Wallet Address copied to clipboard!');
+        }
+
+        async function verifyPayment(event) {
+            event.preventDefault();
+
+            const transactionId = document.getElementById('transactionId').value;
+
+            try {
+                const response = await fetch('/api/orders/verify-payment', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        orderId: orderId,
+                        transactionId: transactionId
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    clearInterval(timerInterval);
+                    document.getElementById('statusMessage').className = 'status-message success';
+                    document.getElementById('statusMessage').textContent = result.message;
+                    document.getElementById('statusMessage').style.display = 'block';
+
+                    setTimeout(() => {
+                        window.location.href = '/my-courses';
+                    }, 2000);
+                } else {
+                    document.getElementById('statusMessage').className = 'status-message error';
+                    document.getElementById('statusMessage').textContent = result.message;
+                    document.getElementById('statusMessage').style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Verify payment error:', error);
+                alert('An error occurred. Please try again.');
+            }
+        }
+
+        startTimer();
+    </script>
+</body>
+
+</html>

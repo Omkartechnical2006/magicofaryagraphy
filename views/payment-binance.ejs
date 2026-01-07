@@ -75,13 +75,26 @@
                                 style="max-width: 200px; border-radius: 12px; border: 1px solid #333;">
                         </div>
 
-                        <div class="upi-id-display">
-                            <span class="label">Wallet:</span>
-                            <span class="value" style="font-size: 0.8rem; word-break: break-all;">
-                                <%= settings.binanceWallet || 'No wallet configured' %>
-                            </span>
-                            <button onclick="copyWallet()" class="btn-copy">Copy</button>
-                        </div>
+                        <% if (settings.binanceWallet && (settings.binanceWallet.startsWith('http'))) { %>
+                            <!-- Display Payment Link Button -->
+                            <div style="text-align: center; margin-bottom: 1rem;">
+                                <a href="<%= settings.binanceWallet %>" target="_blank" class="btn-primary"
+                                    style="display: inline-block; width: 100%; text-decoration: none; padding: 1rem; background: #FCD535; color: #181A20; font-weight: bold;">
+                                    Pay via Binance App ↗
+                                </a>
+                                <p style="font-size: 0.8rem; margin-top: 0.5rem; color: #a0a0c0;">Click above to open
+                                    payment link</p>
+                            </div>
+                            <% } else { %>
+                                <!-- Display Wallet Address Copy -->
+                                <div class="upi-id-display">
+                                    <span class="label">Wallet:</span>
+                                    <span class="value" style="font-size: 0.8rem; word-break: break-all;">
+                                        <%= settings.binanceWallet || 'No wallet configured' %>
+                                    </span>
+                                    <button onclick="copyWallet()" class="btn-copy">Copy</button>
+                                </div>
+                                <% } %>
                     </div>
 
                     <!-- Transaction ID Form -->
